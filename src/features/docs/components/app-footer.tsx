@@ -11,6 +11,10 @@ const legalLinks = [
 		label: "Disclosures",
 		href: "https://nostalgie.world/disclosures",
 	},
+	{
+		label: "Community Guidelines",
+		href: "https://nostalgie.world/community-guidelines",
+	},
 ];
 
 export function AppFooter() {

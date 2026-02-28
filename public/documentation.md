@@ -54,7 +54,7 @@ You can use Wall of Nostalgia to:
 - redeem gift codes
 - manage credits and settings
 
-\*A Beacon is a short public message of love, affirmation, support, or encouragement that you share with the Wall of Nostalgia community. It is meant for kind, uplifting, and emotionally warm content.
+\*A Beacon is a short public message of love, affirmation, support, or encouragement that you share with the Wall of Nostalgia community. It is meant for kind, uplifting, and emotionally warm content. All posts must align with our [community guidelines](https://nostalgie.world/community-guidelines).
 
 ## Create your account
 
