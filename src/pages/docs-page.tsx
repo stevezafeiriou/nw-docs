@@ -37,6 +37,7 @@ import {
 	getVisiblePages,
 	getVisibleProducts,
 } from "../features/docs/lib/doc-routing";
+import { rankDocumentationPages } from "../features/docs/lib/docs-search";
 import { getDefaultDescription, getSiteName, setSeoMetadata } from "../features/docs/lib/seo";
 import { useTheme } from "../features/docs/hooks/use-theme";
 import type { DocsPage, DocsProduct } from "../features/docs/types";
@@ -120,14 +121,6 @@ function getHeaderDescription(productSlug: string, pageSlug: string) {
 	return getProductDescription(productSlug);
 }
 
-function filterPages(pages: DocsPage[], searchQuery: string) {
-	if (!searchQuery) {
-		return pages;
-	}
-
-	return pages.filter((page) => page.searchText.includes(searchQuery));
-}
-
 function groupPagesByCategory(pages: DocsPage[]) {
 	const groups = new Map<string, DocsPage[]>();
 
@@ -200,14 +193,16 @@ export default function DocsPage() {
 			: null;
 	const suggestedPages = data ? getFlattenedVisiblePages(data).slice(0, 8) : [];
 	const leadProduct = visibleProducts[0] ?? null;
-	const topFoundationPages = leadProduct
-		? filterPages(
-				getVisiblePages(leadProduct).filter(
+	const searchResults =
+		data && deferredSearchQuery
+			? rankDocumentationPages(data, deferredSearchQuery, activeProduct?.slug)
+			: [];
+	const topFoundationPages =
+		leadProduct && !deferredSearchQuery
+			? getVisiblePages(leadProduct).filter(
 					(page) => page.category === "Foundation",
-				),
-				deferredSearchQuery,
-		  )
-		: [];
+			  )
+			: [];
 
 	useEffect(() => {
 		if (status === "loading") {
@@ -301,7 +296,49 @@ export default function DocsPage() {
 						</div>
 
 						<nav className="mt-5 flex-1 space-y-3">
-							{topFoundationPages.length > 0 ? (
+							{deferredSearchQuery ? (
+								<div>
+									<div className="flex items-center gap-2 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/34">
+										<FiSearch className="text-sm" />
+										<span>Search results</span>
+									</div>
+									<div className="mt-2 space-y-1">
+										{searchResults.length > 0 ? (
+											searchResults.map(({ product, page }) => {
+												const ProductIcon = getProductIcon(product.slug);
+												return (
+													<NavLink
+														key={`${product.slug}-${page.slug}`}
+														to={`/docs/${product.slug}/${page.slug}`}
+														onClick={() => setIsMobileMenuOpen(false)}
+														className={({ isActive }) =>
+															`app-nav-item block px-3 py-3 text-sm font-medium ${
+																isActive ? "app-nav-item-active" : ""
+															}`
+														}
+													>
+														<div className="flex items-start gap-2.5">
+															<ProductIcon className="mt-0.5 shrink-0 text-sm text-white/56" />
+															<div className="min-w-0">
+																<div className="truncate text-sm text-inherit">
+																	{page.title}
+																</div>
+																<div className="mt-1 truncate text-[11px] uppercase tracking-[0.14em] text-white/42">
+																	{product.title}
+																</div>
+															</div>
+														</div>
+													</NavLink>
+												);
+											})
+										) : (
+											<div className="rounded-2xl border border-dashed border-white/10 px-3 py-4 text-sm text-white/52">
+												No pages match this search.
+											</div>
+										)}
+									</div>
+								</div>
+							) : topFoundationPages.length > 0 ? (
 								<div>
 									<div className="flex items-center gap-2 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/34">
 										<FiCompass className="text-sm" />
@@ -326,19 +363,16 @@ export default function DocsPage() {
 								</div>
 							) : null}
 
-							{visibleProducts.map((product) => {
+							{!deferredSearchQuery
+								? visibleProducts.map((product) => {
 								const productPages = getVisiblePages(product);
-								const visiblePages = filterPages(
+								const visiblePages =
 									product === leadProduct
 										? productPages.filter(
 												(page) => page.category !== "Foundation",
 										  )
-										: productPages,
-									deferredSearchQuery,
-								);
-								const isExpanded = deferredSearchQuery
-									? visiblePages.length > 0
-									: !(collapsedProducts[product.slug] ?? true);
+										: productPages;
+								const isExpanded = !(collapsedProducts[product.slug] ?? true);
 								const groupedPages = groupPagesByCategory(visiblePages);
 
 								return (
@@ -366,44 +400,39 @@ export default function DocsPage() {
 
 										{isExpanded ? (
 											<div className="mt-2 space-y-4 pb-1">
-												{groupedPages.length > 0 ? (
-													groupedPages.map(([category, pages]) => {
-														const CategoryIcon = getCategoryIcon(category);
-														return (
-															<div key={category}>
-																<div className="mt-4 flex items-center gap-2 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/34 first:mt-0">
-																	<CategoryIcon className="text-sm" />
-																	<span>{category}</span>
-																</div>
-																<div className="mt-2 space-y-1">
-																	{pages.map((page) => (
-																		<NavLink
-																			key={`${product.slug}-${page.slug}`}
-																			to={`/docs/${product.slug}/${page.slug}`}
-																			onClick={() => setIsMobileMenuOpen(false)}
-																			className={({ isActive }) =>
-																				`app-nav-item block px-3 py-3 text-sm font-medium ${
-																					isActive ? "app-nav-item-active" : ""
-																				}`
-																			}
-																		>
-																			{page.title}
-																		</NavLink>
-																	))}
-																</div>
+												{groupedPages.map(([category, pages]) => {
+													const CategoryIcon = getCategoryIcon(category);
+													return (
+														<div key={category}>
+															<div className="mt-4 flex items-center gap-2 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/34 first:mt-0">
+																<CategoryIcon className="text-sm" />
+																<span>{category}</span>
 															</div>
-														);
-													})
-												) : (
-													<div className="rounded-2xl border border-dashed border-white/10 px-3 py-4 text-sm text-white/52">
-														No pages match this search.
-													</div>
-												)}
+															<div className="mt-2 space-y-1">
+																{pages.map((page) => (
+																	<NavLink
+																		key={`${product.slug}-${page.slug}`}
+																		to={`/docs/${product.slug}/${page.slug}`}
+																		onClick={() => setIsMobileMenuOpen(false)}
+																		className={({ isActive }) =>
+																			`app-nav-item block px-3 py-3 text-sm font-medium ${
+																				isActive ? "app-nav-item-active" : ""
+																			}`
+																		}
+																	>
+																		{page.title}
+																	</NavLink>
+																))}
+															</div>
+														</div>
+													);
+												})}
 											</div>
 										) : null}
 									</div>
 								);
-							})}
+							})
+								: null}
 						</nav>
 
 						<div className="mt-4 overflow-hidden rounded-[1.45rem] border border-white/10 bg-white/[0.045]">

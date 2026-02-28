@@ -103,6 +103,26 @@ function buildHeadings(markdown: string) {
 	return headings;
 }
 
+function buildSearchKeywords(
+	title: string,
+	category: string,
+	headings: DocsHeading[],
+	summary: string,
+) {
+	return Array.from(
+		new Set(
+			[
+				title,
+				category,
+				summary,
+				...headings.map((heading) => heading.title),
+			]
+				.map((value) => plainText(value).toLowerCase())
+				.filter(Boolean),
+		),
+	);
+}
+
 function createPage(
 	productSlug: string,
 	title: string,
@@ -112,16 +132,23 @@ function createPage(
 	const normalizedTitle = normalizeTitle(title);
 	const slug = createUniqueSlug(normalizedTitle, pageSlugCounts);
 	const hidden = HIDDEN_SECTION_TITLES.has(normalizedTitle.toLowerCase());
+	const category = inferCategory(normalizedTitle);
+	const cleanedMarkdown = markdown.trim();
+	const headings = buildHeadings(markdown);
+	const bodyText = plainText(markdown).toLowerCase();
+	const summary = buildSectionSummary(markdown, normalizedTitle);
 
 	return {
 		id: `${productSlug}-${slug}`,
 		title: normalizedTitle,
 		slug,
-		category: inferCategory(normalizedTitle),
-		summary: buildSectionSummary(markdown, normalizedTitle),
-		markdown: markdown.trim(),
-		headings: buildHeadings(markdown),
-		searchText: `${normalizedTitle} ${plainText(markdown)}`.toLowerCase(),
+		category,
+		summary,
+		markdown: cleanedMarkdown,
+		headings,
+		searchText: `${normalizedTitle} ${bodyText}`.toLowerCase(),
+		searchKeywords: buildSearchKeywords(normalizedTitle, category, headings, summary),
+		searchBody: bodyText,
 		productSlug,
 		hidden,
 	};

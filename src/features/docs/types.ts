@@ -13,6 +13,8 @@ export interface DocsPage {
 	markdown: string;
 	headings: DocsHeading[];
 	searchText: string;
+	searchKeywords: string[];
+	searchBody: string;
 	productSlug: string;
 	hidden: boolean;
 }
