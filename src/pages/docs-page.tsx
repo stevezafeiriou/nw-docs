@@ -1,5 +1,4 @@
-import { useDeferredValue, useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { Suspense, lazy, useDeferredValue, useEffect, useState } from "react";
 import {
 	FiArrowRight,
 	FiBookOpen,
@@ -14,20 +13,20 @@ import {
 	FiMoon,
 	FiMonitor,
 	FiExternalLink,
+	FiGithub,
 	FiSearch,
 	FiSun,
 	FiZap,
 } from "react-icons/fi";
-import remarkGfm from "remark-gfm";
 import { Link, NavLink, useParams } from "react-router-dom";
 import charsImage from "../assets/chars.jpg";
 import fallingImage from "../assets/falling.jpg";
 import impressedImage from "../assets/impressed.jpg";
 import promoImage from "../assets/promo.jpg";
 import { AppFooter } from "../features/docs/components/app-footer";
-import { AskAiPanel } from "../features/docs/components/ask-ai-panel";
+import { AskAiPanelShell } from "../features/docs/components/ask-ai-panel-shell";
 import { DocsLoadingShell } from "../features/docs/components/docs-loading-shell";
-import { markdownComponents } from "../features/docs/components/markdown-components";
+import { DocsMarkdownShell } from "../features/docs/components/docs-markdown-shell";
 import { useDocumentation } from "../features/docs/hooks/use-documentation";
 import {
 	getFlattenedVisiblePages,
@@ -41,6 +40,13 @@ import { rankDocumentationPages } from "../features/docs/lib/docs-search";
 import { getDefaultDescription, getSiteName, setSeoMetadata } from "../features/docs/lib/seo";
 import { useTheme } from "../features/docs/hooks/use-theme";
 import type { DocsPage, DocsProduct } from "../features/docs/types";
+
+const AskAiPanel = lazy(
+	() => import("../features/docs/components/ask-ai-panel"),
+);
+const DocsMarkdownArticle = lazy(
+	() => import("../features/docs/components/docs-markdown-article"),
+);
 
 function getCategoryIcon(category: string) {
 	switch (category) {
@@ -440,6 +446,8 @@ export default function DocsPage() {
 								src={impressedImage}
 								alt="Nostalgie World editorial visual"
 								className="h-32 w-full object-cover"
+								loading="lazy"
+								decoding="async"
 							/>
 							<div className="px-4 py-4">
 								<p className="text-sm font-semibold text-white">
@@ -491,10 +499,24 @@ export default function DocsPage() {
 								<FiMenu />
 							</button>
 							<div className="flex items-center gap-3">
-								<div className="hidden h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-4 text-sm text-[var(--muted)] sm:inline-flex">
+								<a
+									href="https://github.com/stevezafeiriou"
+									target="_blank"
+									rel="noopener noreferrer"
+									aria-label="Open Steve Zafeiriou GitHub profile"
+									className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--text)]"
+								>
+									<FiGithub />
+								</a>
+								<a
+									href="https://nostalgie.world"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="hidden h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-4 text-sm text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--text)] sm:inline-flex"
+								>
 									<FiZap className="text-[var(--primary-strong)]" />
-									Markdown generated
-								</div>
+									Nostalgie World
+								</a>
 								<button
 									type="button"
 									onClick={() => setIsAiPanelOpen((value) => !value)}
@@ -553,6 +575,7 @@ export default function DocsPage() {
 													src={activeImage}
 													alt={`${activeProduct.title} visual`}
 													className="h-full min-h-[220px] w-full object-cover"
+													decoding="async"
 												/>
 											</div>
 										</div>
@@ -566,14 +589,9 @@ export default function DocsPage() {
 										}
 									>
 										<article className="app-card surface-outline fade-in overflow-hidden p-6 sm:p-7">
-											<div className="prose-docs mx-auto max-w-4xl">
-												<ReactMarkdown
-													components={markdownComponents}
-													remarkPlugins={[remarkGfm]}
-												>
-													{activePage.markdown}
-												</ReactMarkdown>
-											</div>
+											<Suspense fallback={<DocsMarkdownShell />}>
+												<DocsMarkdownArticle markdown={activePage.markdown} />
+											</Suspense>
 
 											<div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
 												{pageSiblings?.previous ? (
@@ -692,6 +710,8 @@ export default function DocsPage() {
 												src={fallingImage}
 												alt="Decorative route mismatch artwork"
 												className="h-64 w-full object-cover lg:h-full"
+												loading="lazy"
+												decoding="async"
 											/>
 										</div>
 									</div>
@@ -705,7 +725,9 @@ export default function DocsPage() {
 					{isAiPanelOpen && isDesktopAiDocked ? (
 						<div className="hidden xl:block">
 							<div className="sticky top-3 h-[calc(100vh-1.5rem)]">
-								<AskAiPanel />
+								<Suspense fallback={<AskAiPanelShell />}>
+									<AskAiPanel />
+								</Suspense>
 							</div>
 						</div>
 					) : null}
@@ -714,7 +736,9 @@ export default function DocsPage() {
 
 			{isAiPanelOpen && !isDesktopAiDocked ? (
 				<div className="fixed inset-y-3 right-3 z-[85] w-[calc(100vw-1.5rem)] max-w-[360px] xl:hidden">
-					<AskAiPanel isMobile onClose={() => setIsAiPanelOpen(false)} />
+					<Suspense fallback={<AskAiPanelShell isMobile />}>
+						<AskAiPanel isMobile onClose={() => setIsAiPanelOpen(false)} />
+					</Suspense>
 				</div>
 			) : null}
 		</div>

@@ -55,6 +55,8 @@ export default function NotFoundPage() {
 							src={charsImage}
 							alt="Decorative documentation artwork"
 							className="h-64 w-full object-cover lg:h-full"
+							loading="lazy"
+							decoding="async"
 						/>
 					</div>
 				</div>

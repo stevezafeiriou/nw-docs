@@ -10,7 +10,10 @@ interface AskAiPanelProps {
 	onClose?: () => void;
 }
 
-export function AskAiPanel({ isMobile = false, onClose }: AskAiPanelProps) {
+export default function AskAiPanel({
+	isMobile = false,
+	onClose,
+}: AskAiPanelProps) {
 	return (
 		<aside
 			className={`app-card surface-outline flex h-full min-h-[26rem] flex-col overflow-hidden ${
@@ -23,6 +26,8 @@ export function AskAiPanel({ isMobile = false, onClose }: AskAiPanelProps) {
 						src={shortieImage}
 						alt="AI assistant avatar"
 						className="h-10 w-10 rounded-2xl object-cover"
+						loading="lazy"
+						decoding="async"
 					/>
 					<div>
 						<p className="text-sm font-semibold text-[var(--text)]">Ask AI</p>
