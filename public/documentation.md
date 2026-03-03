@@ -319,6 +319,99 @@ You can manage all available settings for the **legacy theme** in the client das
 > **Warning**
 > The refresh rate can be edited, but you should only change it if you understand what it does. If you are unsure, leave it as it is.
 
+## Change legacy theme mirror settings
+
+In Operations Dashboard, the **legacy theme** controls how posts look and behave on the physical mirror screen.
+
+When you open a mirror and go to **Settings**, you are usually changing one of these areas:
+
+- **Theme selection** to make sure the mirror is using **legacy**
+- **Font settings** to control the text style used on screen
+- **Color palette** to control the background, pill colors, borders, and highlight color
+- **Content settings** to control how much post information appears on each pill
+- **Refresh-related settings** that affect how often the mirror checks for updates
+
+### How to change legacy theme settings safely
+
+1. Open **Operations Dashboard**.
+2. Go to **Mirrors**.
+3. Select the mirror you want to update.
+4. Open **Settings**.
+5. Confirm the mirror theme is set to **legacy**.
+6. Change one setting group at a time.
+7. Save your changes.
+8. Check the physical mirror to confirm the result looks correct.
+
+If something looks wrong after a change, return to the same settings area and restore the previous value.
+
+### What each legacy setting changes on the mirror
+
+#### Theme
+
+- **Visual theme: Legacy** turns on the classic mirror experience where post pills fall, stack, fade, and restart in cycles.
+
+If the mirror is not using **legacy**, the settings below may not affect the screen the way you expect.
+
+#### Font
+
+- **Font family** changes the typeface used for post text and labels on the mirror.
+
+Use a clear, readable font if the mirror is viewed from a distance.
+
+#### Color palette
+
+The mirror uses the selected palette to style the legacy pills:
+
+- **Background** affects the standard pill surface color
+- **Primary** affects the standard pill border color
+- **Secondary** affects the enhanced pill surface color
+- **Accent** affects the enhanced border and glow color
+
+Small color changes can noticeably change the mood and readability of the mirror.
+
+#### Content
+
+These settings control how much information appears inside each falling pill:
+
+- **Maximum visible posts** controls how many posts the mirror can work through at a time
+- **Show author name** shows or hides the author name
+- **Show post date** shows or hides the date chip
+- **Maximum text lines** controls how much of each message is shown before it is cut off
+
+Use simpler settings if you want a cleaner mirror display. Use more detailed settings if viewers need more context.
+
+#### Settings that may appear but have limited effect in legacy
+
+Some dashboard settings may still exist, but they do not strongly change the current legacy mirror display. These can include areas such as:
+
+- behavior or transition controls
+- scheduling controls
+- branding controls
+- some advanced filter options
+
+If you change one of these and do not see much difference on the mirror, that can be expected in the current legacy theme.
+
+### Recommended way to update settings
+
+Use this order when making changes:
+
+1. Confirm **legacy** is the selected theme.
+2. Update **font** if needed.
+3. Update the **color palette**.
+4. Adjust **content visibility** settings.
+5. Save.
+6. Review the mirror in person.
+
+This makes it easier to understand which change caused the result you see.
+
+### Best practices for client users
+
+- Change only one group of settings at a time.
+- Review the physical mirror after every save.
+- Avoid changing refresh-related values unless you were told to do so.
+- If readability gets worse, return to a clearer font, stronger contrast, or fewer visible content details.
+- If you are unsure what a setting does, leave it unchanged and ask your Nostalgie World contact.
+
 ## Hide or restore content on one mirror
 
 Mirror moderation only affects the mirror you are currently managing. It does not change content everywhere else.
